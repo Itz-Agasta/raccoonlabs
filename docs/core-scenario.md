@@ -31,7 +31,7 @@ The science result was a miss, reported as one: 0 of 10 seeds reached 18/20 on h
 
 ## Timings
 
-About 30 s from the brief to Bandit's assignment. About 6.5 min from the brief to Patch's approval request, including writing the experiment. About 95 s for the batch, then about 80 s for Reviewer 2's check.
+About 30 s from the brief to Bandit's assignment. About 7 min from the brief to Patch's approval request, including writing the experiment. About 95 s for the batch, then about 80 s for Reviewer 2's check.
 
 ## Not yet covered
 
