@@ -16,7 +16,7 @@ agents:
     description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
     provider: claude
     location: "{location}"
-    directory: "{$agents_dir}/{agent}"
+    directory: "{$agents_dir}/bandit"
     addressing: anyone
     advanced_config: &claude_tools
       tools: [Bash, Read, Write, Edit, Glob, Grep]
@@ -26,7 +26,7 @@ agents:
     description: Engineer. Writes and runs seeded experiments after a student approves.
     provider: claude
     location: "{location}"
-    directory: "{$agents_dir}/{agent}"
+    directory: "{$agents_dir}/patch"
     addressing: anyone
     advanced_config: *claude_tools
   - name: reviewer-2
@@ -34,7 +34,7 @@ agents:
     description: Peer reviewer. Checks claims against logged runs. At least 3 seeds.
     provider: codex
     location: "{location}"
-    directory: "{$agents_dir}/{agent}"
+    directory: "{$agents_dir}/reviewer-2"
     addressing: anyone
     advanced_config:
       webSearch: "false"

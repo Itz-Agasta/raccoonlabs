@@ -36,7 +36,9 @@ def test_web_access_is_off(agents):
 
 
 def test_agents_work_outside_the_repo(agents):
-    assert {a["directory"] for a in agents.values()} == {"{$agents_dir}/{agent}"}
+    # Written per agent: {agent} is only defined for single-agent templates.
+    for name, agent in agents.items():
+        assert agent["directory"] == f"{{$agents_dir}}/{name}"
 
 
 def test_room_is_private_with_docs(doc):
