@@ -92,3 +92,21 @@ def test_show_prints_the_manifest(tmp_path):
     execute(tmp_path, "b", "-c", "pass  # {seed}", seeds="0")
     r = run(tmp_path, "show", "--batch", "b")
     assert json.loads(r.stdout)["batch"] == "b"
+
+
+def test_each_seed_records_when_it_ran(tmp_path):
+    execute(tmp_path, "b", "-c", "pass  # {seed}", seeds="0,1")
+    m = manifest(tmp_path, "b")
+    assert m["finished_at"] >= m["started_at"]
+    for s in m["seeds"]:
+        assert m["started_at"] <= s["started_at"] <= s["finished_at"] <= m["finished_at"]
+
+
+def test_seed_entries_are_in_seed_order_after_parallel_runs(tmp_path):
+    execute(tmp_path, "b", "-c", "import time; time.sleep(0.3 if {seed} == 0 else 0)", seeds="0,1,2", extra=("--jobs", "3"))
+    assert [s["seed"] for s in manifest(tmp_path, "b")["seeds"]] == [0, 1, 2]
+
+
+def test_check_says_it_only_covers_clean_exits(tmp_path):
+    execute(tmp_path, "b", "-c", "pass  # {seed}")
+    assert "clean exits only" in run(tmp_path, "check", "--batch", "b").stdout

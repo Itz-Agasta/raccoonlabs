@@ -22,6 +22,10 @@ from pathlib import Path
 DEFAULT_RUNS = Path.home() / ".local/share/raccoonlabs/runs"
 
 
+def now():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
 def write_manifest(path, manifest):
     tmp = path.with_suffix(".tmp")
     tmp.write_text(json.dumps(manifest, indent=2) + "\n")
@@ -30,6 +34,7 @@ def write_manifest(path, manifest):
 
 def run_seed(seed, command, log, timeout):
     argv = [part.replace("{seed}", str(seed)) for part in command]
+    started_at = now()
     start = time.monotonic()
     exit_code, timed_out = None, False
     with log.open("w") as out:
@@ -44,6 +49,8 @@ def run_seed(seed, command, log, timeout):
         "seed": seed,
         "exit_code": exit_code,
         "seconds": round(time.monotonic() - start, 2),
+        "started_at": started_at,
+        "finished_at": now(),
         "log": str(log),
         "timed_out": timed_out,
     }
@@ -72,7 +79,7 @@ def cmd_exec(args):
         "batch": args.batch,
         "command": command,
         "approved_by": args.approved_by,
-        "started_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "started_at": now(),
         "seeds": [],
     }
     path = batch_dir / "manifest.json"
@@ -83,11 +90,14 @@ def cmd_exec(args):
         entry = run_seed(seed, command, batch_dir / f"seed-{seed}.log", args.timeout)
         with lock:
             manifest["seeds"].append(entry)
+            manifest["seeds"].sort(key=lambda s: s["seed"])
             write_manifest(path, manifest)
         return entry
 
     with ThreadPoolExecutor(max_workers=args.jobs) as pool:
         entries = list(pool.map(work, seeds))
+    manifest["finished_at"] = now()
+    write_manifest(path, manifest)
     good = sum(e["exit_code"] == 0 for e in entries)
     print(f"batch {args.batch}: {good} of {len(entries)} seeds succeeded; manifest at {path}")
     return 0 if good == len(entries) else 1
@@ -106,7 +116,10 @@ def cmd_check(args):
         return fail(f"no batch named {args.batch} in {args.runs_dir}")
     good = sum(s["exit_code"] == 0 for s in manifest["seeds"])
     enough = good >= args.min_seeds
-    print(f"batch {args.batch}: {good} of {args.min_seeds} required seeds succeeded: {'PASS' if enough else 'FAIL'}")
+    print(
+        f"batch {args.batch}: {good} of {args.min_seeds} required seeds succeeded: {'PASS' if enough else 'FAIL'} "
+        "(clean exits only; compare the logs against any claimed result)"
+    )
     return 0 if enough else 1
 
 

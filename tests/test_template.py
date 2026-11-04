@@ -41,11 +41,12 @@ def test_agents_work_outside_the_repo(agents):
         assert agent["directory"] == f"{{$agents_dir}}/{name}"
 
 
-def test_room_is_private_with_docs(doc):
+def test_room_is_private_and_bandit_owns_its_docs(doc):
     room = doc["room"]
     assert room["channel_type"] == "channel_private"
     assert room["name"] == "lab-core"
-    assert {d["name"] for d in room["docs"]} == {"Tasks", "Notebook"}
+    # Only the agent that created a room document can edit it, so Bandit creates its own.
+    assert "docs" not in room
     assert set(room["agents"]) == {"bandit", "patch", "reviewer-2"}
 
 
@@ -60,7 +61,7 @@ def test_gate_rules_present():
     bandit = (ROOT / "agents/bandit.md").read_text()
     assert "--approved-by" in patch and "No approval, no run" in patch
     assert "labrun check" in reviewer and "3 seeds" in reviewer
-    assert "Tasks" in bandit and "Notebook" in bandit and "never run experiments" in bandit
+    assert "Create the room documents `Tasks` and `Notebook` yourself" in bandit and "never run experiments" in bandit
 
 
 def test_personas_have_no_template_placeholders():

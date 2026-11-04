@@ -48,12 +48,3 @@ room:
   instructions: |
     A student research group's lab. Students decide and approve. Agents do the
     work and report honestly. Address agents by name with @.
-  docs:
-    - name: Tasks
-      description: The lab's task board, kept by Bandit.
-      instructions: One line per task, with owner and status.
-      content: "# Tasks\n"
-    - name: Notebook
-      description: The lab's results log, kept by Bandit.
-      instructions: One entry per checked result, with batch ID, numbers and approver.
-      content: "# Notebook\n"
