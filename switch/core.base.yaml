@@ -1,0 +1,59 @@
+# Source for core.template.yaml. Persona text comes from agents/*.md; run `just template`.
+version: 1
+params:
+  bridge:
+    type: bridge
+    description: The messaging app the lab's room lives in.
+    default: [racoonlabs, $first]
+  location:
+    type: location
+    description: The machine the lab's agents run on.
+    default: local
+    input: advanced
+agents:
+  - name: bandit
+    display_name: Bandit
+    description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/{agent}"
+    addressing: anyone
+    advanced_config: &claude_tools
+      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      disallowedTools: [WebSearch, WebFetch]
+  - name: patch
+    display_name: Patch
+    description: Engineer. Writes and runs seeded experiments after a student approves.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/{agent}"
+    addressing: anyone
+    advanced_config: *claude_tools
+  - name: reviewer-2
+    display_name: Reviewer 2
+    description: Peer reviewer. Checks claims against logged runs. At least 3 seeds.
+    provider: codex
+    location: "{location}"
+    directory: "{$agents_dir}/{agent}"
+    addressing: anyone
+    advanced_config:
+      webSearch: "false"
+room:
+  name: lab-core
+  description: The core lab. Students, a manager, an engineer and a reviewer.
+  bridge: "{bridge}"
+  channel_type: channel_private
+  agents: [bandit, patch, reviewer-2]
+  users: ["{$creator}"]
+  instructions: |
+    A student research group's lab. Students decide and approve. Agents do the
+    work and report honestly. Address agents by name with @.
+  docs:
+    - name: Tasks
+      description: The lab's task board, kept by Bandit.
+      instructions: One line per task, with owner and status.
+      content: "# Tasks\n"
+    - name: Notebook
+      description: The lab's results log, kept by Bandit.
+      instructions: One entry per checked result, with batch ID, numbers and approver.
+      content: "# Notebook\n"
