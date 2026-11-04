@@ -1,0 +1,41 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[margin=2cm]{geometry}
+\usepackage{amsmath,booktabs,graphicx,hyperref,tikz}
+\usetikzlibrary{arrows.meta,positioning}
+
+\title{Paper Title}
+\author{Author names (students write this line)}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+One paragraph: the question, the method, the main result with its numbers.
+\end{abstract}
+
+\section{Introduction}
+The question and why it matters.
+
+\section{Method}
+\begin{figure}[t]
+  \centering
+  \input{figures/method.tex}
+  \caption{Method overview.}
+  \label{fig:method}
+\end{figure}
+Describe the setup. Figure~\ref{fig:method} shows the method.
+
+\section{Results}
+Report only numbers from logged runs, and name the batch ID for each.
+
+\section{Limitations}
+What this can't show.
+
+\section*{AI use disclosure}
+State which sections the students wrote and which the lab's agents drafted.
+
+\nocite{example}
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}

@@ -1,0 +1,111 @@
+# Source for lab.template.yaml. Persona text comes from agents/*.md; run `just template`.
+version: 1
+params:
+  bridge:
+    type: bridge
+    description: The messaging app the lab's room lives in.
+    default: [racoonlabs, $first]
+  location:
+    type: location
+    description: The machine the lab's agents run on.
+    default: local
+    input: advanced
+agents:
+  - name: ringtail
+    display_name: Ringtail
+    description: Postdoc. Pushes back on ideas, then writes the plan with the students.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/ringtail"
+    addressing: anyone
+    advanced_config:
+      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      disallowedTools: [WebSearch, WebFetch]
+  - name: bandit
+    display_name: Bandit
+    description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/bandit"
+    addressing: anyone
+    advanced_config:
+      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      disallowedTools: [WebSearch, WebFetch]
+  - name: scout
+    display_name: Scout
+    description: Librarian. Finds sources through lab-search and keeps the library.
+    provider: opencode
+    location: "{location}"
+    directory: "{$agents_dir}/scout"
+    addressing: anyone
+    advanced_config:
+      webSearch: "false"
+  - name: patch
+    display_name: Patch
+    description: Engineer. Writes and runs seeded experiments after a student approves.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/patch"
+    addressing: anyone
+    advanced_config:
+      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      disallowedTools: [WebSearch, WebFetch]
+  - name: quill
+    display_name: Quill
+    description: Scribe. Writes assigned sections, makes figures, builds the PDF.
+    provider: claude
+    location: "{location}"
+    directory: "{$agents_dir}/quill"
+    addressing: anyone
+    advanced_config:
+      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      disallowedTools: [WebSearch, WebFetch]
+  - name: reviewer-2
+    display_name: Reviewer 2
+    description: Peer reviewer. Checks claims against logged runs. At least 3 seeds.
+    provider: codex
+    location: "{location}"
+    directory: "{$agents_dir}/reviewer-2"
+    addressing: anyone
+    advanced_config:
+      webSearch: "false"
+group:
+  name: RaccoonLabs
+  description: A student research group's lab.
+rooms:
+  - name: lab-brainstorm
+    description: Questions, pushback and the plan.
+    bridge: "{bridge}"
+    channel_type: channel_private
+    agents: [ringtail, scout, bandit]
+    users: ["{$creator}"]
+    instructions: |
+      Students bring questions here. Ringtail pushes back, Scout finds sources, and the plan is agreed here. Address agents by name with @.
+  - name: lab-bench
+    description: Tasks, experiments and compute approvals.
+    bridge: "{bridge}"
+    channel_type: channel_private
+    agents: [bandit, scout, patch, reviewer-2]
+    users: ["{$creator}"]
+    instructions: |
+      Bandit runs the task board. Patch runs experiments only after a student approves. Reviewer 2 checks results. Address agents by name with @.
+  - name: lab-paper
+    description: Drafting, figures and PDFs.
+    bridge: "{bridge}"
+    channel_type: channel_private
+    agents: [quill, bandit, scout]
+    users: ["{$creator}"]
+    instructions: |
+      Students assign sections. Quill drafts the rest and posts PDFs here. Address agents by name with @.
+  - name: lab-review
+    description: Integrity check and professor sign-off.
+    bridge: "{bridge}"
+    channel_type: channel_private
+    agents: [ringtail, bandit, reviewer-2]
+    users: ["{$creator}"]
+    instructions: |
+      Reviewer 2 checks drafts before the professor sees them. The professor approves here. Address agents by name with @.
+links:
+  - {from: lab-brainstorm, to: lab-bench, label: plan to work}
+  - {from: lab-bench, to: lab-paper, label: results to paper}
+  - {from: lab-paper, to: lab-review, label: draft to review}

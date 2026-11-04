@@ -1,0 +1,7 @@
+\begin{tikzpicture}[box/.style={draw,rounded corners,minimum height=8mm,align=center,font=\small},node distance=6mm,>={Stealth}]
+  \node[box] (data) {Data};
+  \node[box,right=of data] (model) {Model};
+  \node[box,right=of model] (eval) {Evaluation};
+  \draw[->] (data) -- (model);
+  \draw[->] (model) -- (eval);
+\end{tikzpicture}

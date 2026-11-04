@@ -12,3 +12,7 @@ install-tools:
 # Rebuild the Switch template from its sources
 template:
     uv run python tools/dev/build_template.py
+
+# Hash the local sealed list into the tracked blocklist
+blocklist:
+    uv run python tools/dev/build_blocklist.py
