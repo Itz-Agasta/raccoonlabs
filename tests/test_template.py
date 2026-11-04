@@ -27,7 +27,7 @@ def test_anyone_in_the_room_can_address_them(agents):
     assert {a["addressing"] for a in agents.values()} == {"anyone"}
 
 
-def test_web_access_is_off(agents):
+def test_web_settings_are_requested(agents):
     for name in ("bandit", "patch"):
         cfg = agents[name]["advanced_config"]
         assert set(cfg["tools"]) == {"Bash", "Read", "Write", "Edit", "Glob", "Grep"}
@@ -53,6 +53,28 @@ def test_room_is_private_and_bandit_owns_its_docs(doc):
 def test_persona_text_matches_files(agents):
     for name, agent in agents.items():
         assert agent["instructions"].strip() == (ROOT / f"agents/{name}.md").read_text().strip()
+
+
+@pytest.mark.xfail(strict=True, reason="Codex ignores webSearch off: docs/agent-access.md. Harden before any blind run.")
+def test_reviewer_web_access_is_really_closed():
+    assert "**Open: search returned results**" not in (ROOT / "docs/agent-access.md").read_text()
+
+
+def test_reviewer_verifies_approval_and_evidence():
+    reviewer = (ROOT / "agents/reviewer-2.md").read_text()
+    assert "approved_by" in reviewer and "sha256" in reviewer and "exact command" in reviewer
+
+
+def test_patch_rules_for_timing_approval_and_evidence():
+    patch = (ROOT / "agents/patch.md").read_text()
+    assert "one timing seed" in patch and "timeout 120" in patch
+    assert "Slack timestamp" in patch
+    assert "Never delete or edit a batch" in patch
+    assert "sha256" in patch
+
+
+def test_bandit_escalates_when_a_peer_goes_quiet():
+    assert "hasn't answered" in (ROOT / "agents/bandit.md").read_text()
 
 
 def test_gate_rules_present():

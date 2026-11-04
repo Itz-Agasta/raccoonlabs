@@ -21,7 +21,7 @@ A research lab in Slack for **student research groups**: students do the work al
 - **Hackathon rule:** the Switch setup and agent workflow are built from Nov 4 onward with honest commit history. The repo stays private until submission day, then goes public (decision 36). Spikes stay out of the repo.
 - **Keep the sealed paper out of git:** `notes/` is excluded through `.git/info/exclude`. Never name the sealed papers or their findings in tracked files, commits or Switch rooms.
 - **Envelope integrity:** no agent, the Postdoc included, may see the sealed paper before a student posts `unseal`. Every search goes through `lab-search` with the blocklist; built-in web search/fetch stays disabled for lab agents. Agents inherit the user's global provider setup and MCP servers, so lab agents run outside this folder and get probed for web access. Claim only what the probes prove.
-- **`dev-ops` and `tools/dev/` are build-only:** they know the sealed paper, so they stay out of rooms during blind runs and are removed before the final recording. Humans make every approval in the recorded run.
+- **`dev-ops` and `tools/dev/` are build-only:** they know the sealed paper, so they stay out of rooms during blind runs and are removed before the final recording. Humans make every approval in the recorded run, and `~/.config/raccoonlabs/env` is removed first, because agents can read this user's files.
 - **Pre-register spikes:** write the go/no-go rule before seeing the result.
 - **Secrets:** they live in `~/.config/raccoonlabs/env` (mode 600), never in chat or the repo.
 - **Prefer CLIs** or small shell wrappers over adding MCP servers.
