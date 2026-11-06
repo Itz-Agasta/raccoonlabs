@@ -6,7 +6,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[2]
 # Agents already on the dev server, which only the owner can delete. Used for switch/.partial-run.yaml only.
-EXISTING = {"bandit", "patch", "reviewer-2"}
+EXISTING = {"ringtail", "bandit", "scout", "patch", "quill", "reviewer-2"}
 
 
 class NoAliases(yaml.SafeDumper):
