@@ -21,7 +21,7 @@ agents:
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
+      disallowedTools: [WebSearch, WebFetch]
   - name: bandit
     display_name: Bandit
     description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
@@ -32,7 +32,7 @@ agents:
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
+      disallowedTools: [WebSearch, WebFetch]
   - name: scout
     display_name: Scout
     description: Librarian. Finds sources through lab-search and keeps the library.
@@ -53,7 +53,7 @@ agents:
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
+      disallowedTools: [WebSearch, WebFetch]
   - name: quill
     display_name: Quill
     description: Scribe. Writes assigned sections, makes figures, builds the PDF.
@@ -64,7 +64,7 @@ agents:
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
+      disallowedTools: [WebSearch, WebFetch]
   - name: reviewer-2
     display_name: Reviewer 2
     description: Peer reviewer. Checks claims against logged runs. At least 3 seeds.

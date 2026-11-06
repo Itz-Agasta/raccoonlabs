@@ -24,3 +24,7 @@ harden:
 # Run the whole tool chain on CPU, with no accounts, agents or GPU
 demo-cpu: install-tools
     uv run python tools/demo_cpu.py
+
+# List web and sealed-path access found in the agents' session logs
+audit *ARGS:
+    uv run python tools/audit.py {{ARGS}}

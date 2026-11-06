@@ -1,18 +1,18 @@
 # What lab agents can reach
 
-Measured on 2026-11-04 by asking each deployed agent in `#lab-core` to try each action. This is what the demo may claim. Blocked means the attempt failed or the tool doesn't exist; it doesn't mean the agent chose not to.
+Measured by asking each deployed agent to try each action: Bandit, Patch and Reviewer 2 on 2026-11-04 in `#lab-core`, Ringtail, Quill and Scout on 2026-11-04 and 2026-11-06 in the lab rooms. This is what the demo may claim. Blocked means the attempt failed or the tool doesn't exist; it doesn't mean the agent chose not to.
 
-| Check | Bandit, Patch (Claude Code) | Reviewer 2 (Codex) |
-|---|---|---|
-| Built-in web search | Blocked: no tool | **Open: search returned results** |
-| Built-in web fetch | Blocked: no tool | **Open: fetched the page** |
-| User's MCP servers (Exa, Chrome) | Blocked: not in the tool list | None offered, but `codex_apps` tools (such as Canva) are |
-| Shell network (`curl`) | **Open: HTTP 200** | Blocked by Codex's sandbox (exit 6) |
-| Read files outside own folder | **Open** | **Open** |
-| `labrun` | Works | Works |
-| Working folder | `~/.switch/agents/localhost-40401/<agent>` | Same pattern |
+| Check | Ringtail, Bandit, Patch, Quill (Claude Code) | Reviewer 2 (Codex) | Scout (OpenCode) |
+|---|---|---|---|
+| Built-in web search | Blocked: no tool | Blocked: no tool since `just harden` | Reports no tool since `just harden`; declined to try |
+| Built-in web fetch | Blocked: no tool | Blocked: no tool since `just harden` | Reports no tool since `just harden`; declined to try |
+| User's MCP servers (Exa, Chrome) | Blocked: none callable | None offered | Reports none since `just harden` |
+| Shell network (`curl`) | **Open: HTTP 200** | Blocked by Codex's sandbox (exit 6) | Denied in config, not proven: it declined to try. Other programs could still reach the network |
+| Read files outside own folder | **Open** | **Open** | **Open** (counted `notes/`, read nothing) |
+| Literature search | Not given | Not given | `lab-search`, every query logged |
+| Working folder | `~/.switch/agents/localhost-40401/<agent>` | Same pattern | Same pattern |
 
-Settings used are in `switch/core.base.yaml`. Reviewer 2 has `webSearch: "false"`, which had no effect in this test.
+`just harden` writes `agents/config/` into the agents' folders. Switch's `webSearch: "false"` alone had no effect on Reviewer 2 (web search returned results before), and Scout listed `websearch`, `webfetch` and Chrome tools before it. A `Bash(curl:*)` deny rule can't close the Claude agents' shell route under Switch, because it removes Bash altogether.
 
 ## Gaps that follow from this
 
@@ -22,11 +22,12 @@ Settings used are in `switch/core.base.yaml`. Reviewer 2 has `webSearch: "false"
 
 ## Memory
 
-With the server, Console, a browser and all three agents working at once, the lowest `free -m` available reading was 3,023 MB of 7,579 MB, sampled about every 6 seconds through the access check. An idle baseline wasn't recorded. Each agent process used about 260-380 MB.
+With the server, Console, a browser and three agents working at once (2026-11-04), the lowest `free -m` available reading was 3,023 MB of 7,579 MB, sampled about every 6 seconds through the access check. An idle baseline wasn't recorded. Each agent process used about 260-380 MB. With six agent sessions and a browser open, it fell to 1,165 MB. Close the browser for final runs.
 
 ## What the demo may claim today
 
-- Claude Code lab agents have no built-in web or MCP web tools.
-- Nothing stops an agent with shell network access from reaching the web, or any agent from reading files this user can read.
+- Claude Code and Codex lab agents have no built-in web or MCP web tools. Scout reports none.
+- Reviewer 2's shell can't reach the network.
+- Nothing stops a Claude agent's shell from reaching the web, or any agent from reading files this user can read.
 
-Don't say the agents couldn't have looked anything up. See the project's open decision on hardening before a blind run.
+Don't say the agents couldn't have looked anything up. Say what was blocked, and show the audit from `just audit`, which lists every network command and every access to a sealed path that the agents' session logs recorded.
