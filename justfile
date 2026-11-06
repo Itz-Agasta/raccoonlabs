@@ -20,3 +20,7 @@ blocklist:
 # Close the web tools Switch's settings leave open, in the deployed agents' folders
 harden:
     uv run python tools/harden.py
+
+# Run the whole tool chain on CPU, with no accounts, agents or GPU
+demo-cpu: install-tools
+    uv run python tools/demo_cpu.py

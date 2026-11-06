@@ -7,3 +7,4 @@ __pycache__/
 missions/*/runs/*/ckpt/
 .modal.toml
 switch/.partial-run.yaml
+build/
