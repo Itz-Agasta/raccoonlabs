@@ -32,3 +32,7 @@ audit *ARGS:
 # Seal notes/sealed into envelope/sealed.enc (asks for the passphrase; run it in a real terminal)
 seal:
     uv run lab-envelope seal notes/sealed --out envelope/sealed.enc
+
+# Check this machine, install the lab's tools, build the template, and print the Console steps
+up: install-tools template
+    uv run python tools/up.py
