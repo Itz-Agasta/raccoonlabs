@@ -17,7 +17,7 @@ BUILD_ONLY = {"dev-ops", "switch-buddy-admin"}
 
 
 def agent_of(config):
-    found = re.search(r'agents/[^/"]+/([\w-]+)', config.read_text(errors="ignore"))
+    found = re.search(r'"cwd":\s*"[^"]*\.switch/agents/[^/"]+/([\w-]+)"', config.read_text(errors="ignore"))
     return found.group(1) if found else None
 
 

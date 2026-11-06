@@ -19,9 +19,10 @@ from pathlib import Path
 
 DEFAULT_RUNS = Path.home() / ".local/share/raccoonlabs/runs"
 DEFAULT_SOURCES = Path.home() / ".local/share/raccoonlabs/sources.jsonl"
-BATCH = re.compile(r"\bB\d+[A-Za-z0-9_-]*\b")
+BATCH_WORD = re.compile(r"\b[A-Z][A-Za-z_-]*\d+[A-Za-z0-9_-]*\b")
+NAMED_BATCH = re.compile(r"\bbatch(?:es)?\s+\\?(?:texttt\{)?([A-Za-z][\w-]*\d[\w-]*)", re.I)
 NUMBER = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?![\w])")
-PLACEHOLDERS = ("Paper Title", "One paragraph: the question", "State which sections the students wrote")
+PLACEHOLDERS = ("Paper Title", "One paragraph: the question", "State which sections the students wrote", "Author names (students write this line)")
 SHINGLE = 8
 
 
@@ -84,7 +85,8 @@ def run_numbers(batch, runs_dir):
 
 def check_results(tex, runs_dir):
     results = section(tex, "Results")
-    batches = sorted(set(BATCH.findall(results)))
+    # A batch is any word the text calls a batch, or any ID-shaped word with a folder in the runs directory.
+    batches = sorted(set(NAMED_BATCH.findall(results)) | {w for w in BATCH_WORD.findall(results) if (Path(runs_dir) / w / "manifest.json").exists()})
     fails, flags = [], []
     if not batches:
         return batches, ["the Results section names no batch ID"], flags
@@ -95,10 +97,11 @@ def check_results(tex, runs_dir):
             fails.append(f"batch {batch}: {(r.stdout + r.stderr).strip()}")
             continue
         logged |= run_numbers(batch, runs_dir)
-    plain = re.sub(r"\\(?:ref|label|cite\w*|includegraphics|input)(?:\[[^\]]*\])?\{[^}]*\}", " ", BATCH.sub(" ", results))
+    plain = re.sub(r"\\(?:ref|label|cite\w*|includegraphics|input)(?:\[[^\]]*\])?\{[^}]*\}", " ", re.sub("|".join(map(re.escape, batches)), " ", results))
     plain = re.sub(r"\\begin\{\w+\}(?:\[[^\]]*\])?|\\end\{\w+\}", " ", plain)
     for n in sorted(set(NUMBER.findall(plain)), key=float):
-        if float(n) not in logged:
+        tolerance = 0.5 * 10 ** -len(n.partition(".")[2])
+        if not any(abs(float(n) - value) <= tolerance for value in logged):
             flags.append(f"number {n} in Results isn't in the logs of {', '.join(batches)}: confirm it's derived fairly")
     return batches, fails, flags
 
@@ -136,6 +139,8 @@ def cmd_check(args):
     disclosure = section(tex, "AI use disclosure")
     if not disclosure.strip():
         fails.append("no AI use disclosure")
+    if not keys:
+        flags.append("the paper cites nothing")
     fails += [f"template text left in: {p!r}" for p in PLACEHOLDERS if p in tex]
     print(f"citations checked: {len(keys)}; batches named: {', '.join(batches) or 'none'}; sources on file: {len(sources)}")
     for f in fails:

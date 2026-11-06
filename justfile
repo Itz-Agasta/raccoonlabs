@@ -28,3 +28,7 @@ demo-cpu: install-tools
 # List web and sealed-path access found in the agents' session logs
 audit *ARGS:
     uv run python tools/audit.py {{ARGS}}
+
+# Seal notes/sealed into envelope/sealed.enc (asks for the passphrase; run it in a real terminal)
+seal:
+    uv run lab-envelope seal notes/sealed --out envelope/sealed.enc

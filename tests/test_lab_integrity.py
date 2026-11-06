@@ -90,3 +90,16 @@ def test_overlap_with_a_source_is_flagged(lab, capsys):
     edit(lab, "Quill drafted Method.", phrase + ".")
     code, out = run(lab, capsys)
     assert code == 0 and "overlap" in out
+
+
+def test_any_batch_name_counts(lab, capsys):
+    (lab / "runs/B1").rename(lab / "runs/NOISE1")
+    edit(lab, "Batch B1", "Batch NOISE1")
+    code, out = run(lab, capsys)
+    assert code == 0 and "NOISE1" in out
+
+
+def test_unfilled_author_line_fails(lab, capsys):
+    edit(lab, r"\title{A real title}", r"\title{A real title}\author{Author names (students write this line)}")
+    code, out = run(lab, capsys)
+    assert code == 1 and "template text" in out
