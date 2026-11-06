@@ -14,6 +14,10 @@ Measured by asking each deployed agent to try each action: Bandit, Patch and Rev
 
 `just harden` writes `agents/config/` into the agents' folders. Switch's `webSearch: "false"` alone had no effect on Reviewer 2 (web search returned results before), and Scout listed `websearch`, `webfetch` and Chrome tools before it. A `Bash(curl:*)` deny rule can't close the Claude agents' shell route under Switch, because it removes Bash altogether.
 
+## Skills
+
+`just skills` links the research skills into each agent's folder. Probed 2026-11-06: each agent loaded one. Agents also inherit this user's global skills, so the Claude agents list `exa:search`, `composio-cli` and browser skills, and Reviewer 2 lists `agent-reach`. A skill brings instructions, not tools: the browser and Exa tools aren't callable, but a skill that shells out to a CLI could use the Claude agents' open shell route. `just audit` looks for the commands that route would need.
+
 ## Gaps that follow from this
 
 - **Evidence isn't tamper-proof.** Agents run as the same OS user as the run files. `labrun` refuses to overwrite and marks finished files read-only, which stops accidents, not deletion. The sha256 posted in the room is the anchor.

@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 SESSIONS = Path.home() / ".local/state/switch/sdk-sessions"
-RISKY = re.compile(r"\b(curl|wget|urllib|requests\.|httpx|aiohttp|socket|nc |ssh |scp |git clone|lynx|w3m|chrome|firefox)\b|https?://|notes/|sealed|\.enc\b|raccoonlabs/env", re.I)
+RISKY = re.compile(r"\b(composio|agent-reach|exa|curl|wget|urllib|requests\.|httpx|aiohttp|socket|nc |ssh |scp |git clone|lynx|w3m|chrome|firefox)\b|https?://|notes/|sealed|\.enc\b|raccoonlabs/env", re.I)
 ALLOWED = re.compile(r"^(?:\S*/)?(lab-search|lab-paper|lab-integrity|labrun)\b")
 BUILD_ONLY = {"dev-ops", "switch-buddy-admin"}
 
