@@ -9,7 +9,7 @@ Humans make every approval in this run, and it's recorded end to end. The studen
 3. **Fresh rooms.** Rename the four test channels in Slack so their names are free, then run the template's rooms in Console.
 4. **Fresh data.** Move `~/.local/share/raccoonlabs/runs`, `sources.jsonl` and `lab-search.jsonl` aside, and move `paper` out of Quill's folder. Batch IDs can't be reused.
 5. **Remove build-only access.** Delete `dev-ops` (`!delete-agent dev-ops confirm`), remove `tools/dev/` from the working tree for the recording, and delete `~/.config/raccoonlabs/env`, because agents can read this user's files.
-6. **Apply lockdown.** Run `just harden`, then probe Scout and Reviewer 2 once.
+6. **Apply lockdown and skills.** Run `just harden` and `just skills`, then probe Scout and Reviewer 2 once.
 7. **Free memory.** Close the browser. Note the start time for `just audit --since`.
 
 ## During the run

@@ -23,8 +23,8 @@ flowchart LR
 1. **Brainstorm.** A student brings a question to `#lab-brainstorm`. Ringtail asks what would change their mind, Scout fills `Library` through `lab-search`, and Ringtail writes `Plan`. Students approve it, then the professor approves it in `#lab-review`.
 2. **Bench.** Bandit posts `Tasks` and assigns the work. Patch posts each batch's seeds, time and exact command, then stops until a student replies. `labrun` records the approval and the results.
 3. **Review of results.** Reviewer 2 checks the manifest, the logs and who really approved. Accepted numbers go in `Notebook`.
-4. **Paper.** Students choose which sections are theirs. Quill drafts the rest, with a diagram and plots from the run files, and posts the PDF.
-5. **Integrity check.** `lab-integrity` checks that every citation came through `lab-search`, every results number traces to a logged batch or gets flagged, overlap with collected sources is flagged, and an AI use disclosure is present. Only then does the professor see the draft.
+4. **Paper.** Students choose which sections are theirs. Quill drafts the rest as a real research paper, with a method diagram and plots from the run files, and posts the PDF. Traceability lives beside the paper in `provenance.txt`, not in its text.
+5. **Integrity check and peer review.** `lab-integrity` checks that every citation came through `lab-search` and that every results number traces to a logged batch or gets flagged, and it flags overlap with collected sources. Reviewer 2 then reviews the draft like a workshop reviewer. Only then does the professor see it.
 
 ### Who each agent is
 
@@ -32,14 +32,26 @@ Everyone in a room can address its agents. They run on one person's machine, as 
 
 | Agent | Job | Runtime and model | Rooms | What it can reach |
 |---|---|---|---|---|
-| Ringtail | Postdoc: pushes back, writes the plan, final read | Claude Code, Sonnet | brainstorm, review | Room documents, `lab-envelope` |
-| Bandit | Lab Manager: tasks, assignments, notebook | Claude Code, Haiku | all | Room documents |
+| Ringtail | Postdoc: pushes back, writes the plan, final read | Claude Code, Opus | brainstorm, review | Room documents, `lab-envelope` |
+| Bandit | Lab Manager: tasks, assignments, notebook | Claude Code, Sonnet | all | Room documents |
 | Scout | Librarian: finds and tracks sources | OpenCode, free model | brainstorm, bench, paper | `lab-search` only for literature |
 | Patch | Engineer: runs approved experiments | Claude Code, Sonnet | bench | `uv`, `labrun` |
-| Quill | Scribe: writes assigned sections, builds the PDF | Claude Code, Sonnet | paper | `lab-paper`, `tectonic`, `send_attachment` |
+| Quill | Scribe: writes assigned sections, builds the PDF | Claude Code, Opus | paper | `lab-paper`, `tectonic`, `send_attachment` |
 | Reviewer 2 | Peer reviewer: checks evidence and integrity | Codex | bench, review | `labrun`, `lab-integrity`, read-only checks; no network from its shell |
 
 [`docs/agent-access.md`](docs/agent-access.md) records what we measured each agent can and can't reach, including the gaps.
+
+### Skills
+
+Lab members use published research skills. `just skills` clones them at pinned commits outside this repo, because they have their own licences, and links them into each agent's folder.
+
+| Agent | Skills |
+|---|---|
+| Ringtail | [academic-research-skills](https://github.com/Imbad0202/academic-research-skills): `deep-research`, `academic-paper`, `academic-paper-reviewer`; [scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills): `scientific-critical-thinking`, `hypothesis-generation` |
+| Scout | `deep-research`, with every search going through `lab-search` |
+| Patch | `statistical-analysis`, `statistical-power` |
+| Quill | `academic-paper`, [OpenTikZ](https://github.com/opentikz/opentikz), [CVPR-Figure](https://github.com/ChizkiyahuOhayon/CVPR-Figure), `scientific-visualization`, plus [tueplots](https://github.com/pnkraemer/tueplots) and [SciencePlots](https://github.com/garrettj403/SciencePlots) for plots |
+| Reviewer 2 | [academic-research-skills-codex](https://github.com/Imbad0202/academic-research-skills-codex), `statistical-analysis`, `scientific-critical-thinking` |
 
 ### Why Switch is central
 
@@ -75,6 +87,7 @@ Then in Console, select **Templates → Import template**, choose `switch/lab.te
 
 ```sh
 just harden    # closes web tools Switch's own setting leaves open on Scout and Reviewer 2
+just skills    # installs the research skills and links them to the agents
 ```
 
 Then address `@ringtail` with a question in `#lab-brainstorm`.
@@ -96,9 +109,9 @@ What this does and doesn't prove:
 | Command | What it does |
 |---|---|
 | `labrun` | Runs a command across seeds and keeps a manifest, logs, the approver and a sha256 |
-| `lab-search` | Searches arXiv, Crossref and Semantic Scholar, applies the blocklist, logs every query |
+| `lab-search` | Searches arXiv, Crossref and Semantic Scholar, reads arXiv full text, applies the blocklist, logs every query |
 | `lab-paper` | Starts and compiles the LaTeX paper, and fails on undefined citations |
-| `lab-integrity` | Checks citations, numbers, overlap and the disclosure |
+| `lab-integrity` | Checks citations, numbers and overlap, and that the paper reads as a paper |
 | `lab-envelope` | Seals and opens the envelope, and checks a scorecard |
 
 `just test` runs the test suite. `just --list` shows every recipe.

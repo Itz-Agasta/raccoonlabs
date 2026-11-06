@@ -15,23 +15,23 @@ agents:
     display_name: Ringtail
     description: Postdoc. Pushes back on ideas, then writes the plan with the students.
     provider: claude
-    model: sonnet
+    model: opus
     location: "{location}"
     directory: "{$agents_dir}/ringtail"
     addressing: anyone
     advanced_config:
-      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      tools: [Bash, Read, Write, Edit, Glob, Grep, Skill, Agent]
       disallowedTools: [WebSearch, WebFetch]
   - name: bandit
     display_name: Bandit
     description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
     provider: claude
-    model: haiku
+    model: sonnet
     location: "{location}"
     directory: "{$agents_dir}/bandit"
     addressing: anyone
     advanced_config:
-      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      tools: [Bash, Read, Write, Edit, Glob, Grep, Skill]
       disallowedTools: [WebSearch, WebFetch]
   - name: scout
     display_name: Scout
@@ -52,18 +52,18 @@ agents:
     directory: "{$agents_dir}/patch"
     addressing: anyone
     advanced_config:
-      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      tools: [Bash, Read, Write, Edit, Glob, Grep, Skill]
       disallowedTools: [WebSearch, WebFetch]
   - name: quill
     display_name: Quill
     description: Scribe. Writes assigned sections, makes figures, builds the PDF.
     provider: claude
-    model: sonnet
+    model: opus
     location: "{location}"
     directory: "{$agents_dir}/quill"
     addressing: anyone
     advanced_config:
-      tools: [Bash, Read, Write, Edit, Glob, Grep]
+      tools: [Bash, Read, Write, Edit, Glob, Grep, Skill, Agent]
       disallowedTools: [WebSearch, WebFetch]
   - name: reviewer-2
     display_name: Reviewer 2

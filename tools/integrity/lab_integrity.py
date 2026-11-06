@@ -3,9 +3,9 @@
 
   lab-integrity check PAPER_DIR [--runs-dir DIR] [--sources FILE]
 
-FAIL stops the draft: a cited source lab-search never returned, a batch ID that
-fails `labrun check`, a results section naming no batch, a missing or unedited
-disclosure, or a template placeholder left in.
+FAIL stops the draft: a cited source lab-search never returned, a batch in
+provenance.txt that fails `labrun check`, no batches listed there, the lab's own
+machinery named in the paper, or a template placeholder left in.
 FLAG needs a person to look: a results number found in no log of the named
 batches (it may be a fair average), or text overlapping a collected source.
 This is an integrity check, not plagiarism detection.
@@ -19,10 +19,10 @@ from pathlib import Path
 
 DEFAULT_RUNS = Path.home() / ".local/share/raccoonlabs/runs"
 DEFAULT_SOURCES = Path.home() / ".local/share/raccoonlabs/sources.jsonl"
-BATCH_WORD = re.compile(r"\b[A-Z][A-Za-z_-]*\d+[A-Za-z0-9_-]*\b")
-NAMED_BATCH = re.compile(r"\bbatch(?:es)?\s+\\?(?:texttt\{)?([A-Za-z][\w-]*\d[\w-]*)", re.I)
+MACHINERY = re.compile(r"\b(?:labrun|lab-search|lab-paper|lab-integrity|Ringtail|Quill|Reviewer 2|Slack|role-played|laptop|RAM)\b")
 NUMBER = re.compile(r"(?<![\w.])\d+(?:\.\d+)?(?![\w])")
-PLACEHOLDERS = ("Paper Title", "One paragraph: the question", "State which sections the students wrote", "Author names (students write this line)")
+PLACEHOLDERS = ("Paper Title", "One paragraph: the question", "Author names (students write this line)", "The problem, the gap in prior work",
+                "What is already known, synthesised", "Report every condition with its spread", "What was found, and what should come next")
 SHINGLE = 8
 
 
@@ -83,13 +83,19 @@ def run_numbers(batch, runs_dir):
     return numbers
 
 
-def check_results(tex, runs_dir):
+def provenance(paper):
+    path = Path(paper) / "provenance.txt"
+    if not path.exists():
+        return []
+    lines = (line.split() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#"))
+    return [parts[0] for parts in lines]
+
+
+def check_results(tex, runs_dir, batches):
     results = section(tex, "Results")
-    # A batch is any word the text calls a batch, or any ID-shaped word with a folder in the runs directory.
-    batches = sorted(set(NAMED_BATCH.findall(results)) | {w for w in BATCH_WORD.findall(results) if (Path(runs_dir) / w / "manifest.json").exists()})
     fails, flags = [], []
     if not batches:
-        return batches, ["the Results section names no batch ID"], flags
+        return ["provenance.txt lists no batch"], flags
     logged = set()
     for batch in batches:
         r = subprocess.run(["labrun", "check", "--batch", batch, "--runs-dir", str(runs_dir)], capture_output=True, text=True)
@@ -97,13 +103,13 @@ def check_results(tex, runs_dir):
             fails.append(f"batch {batch}: {(r.stdout + r.stderr).strip()}")
             continue
         logged |= run_numbers(batch, runs_dir)
-    plain = re.sub(r"\\(?:ref|label|cite\w*|includegraphics|input)(?:\[[^\]]*\])?\{[^}]*\}", " ", re.sub("|".join(map(re.escape, batches)), " ", results))
+    plain = re.sub(r"\\(?:ref|label|cite\w*|includegraphics|input)(?:\[[^\]]*\])?\{[^}]*\}", " ", results)
     plain = re.sub(r"\\begin\{\w+\}(?:\[[^\]]*\])?|\\end\{\w+\}", " ", plain)
     for n in sorted(set(NUMBER.findall(plain)), key=float):
         tolerance = 0.5 * 10 ** -len(n.partition(".")[2])
         if not any(abs(float(n) - value) <= tolerance for value in logged):
             flags.append(f"number {n} in Results isn't in the logs of {', '.join(batches)}: confirm it's derived fairly")
-    return batches, fails, flags
+    return fails, flags
 
 
 def check_overlap(tex, sources):
@@ -133,12 +139,12 @@ def cmd_check(args):
     bib = bib_entries(bib_path.read_text()) if bib_path.exists() else {}
     sources = load_sources(args.sources)
     keys, fails = check_citations(tex, bib, sources)
-    batches, more, flags = check_results(tex, args.runs_dir)
+    batches = provenance(paper)
+    more, flags = check_results(tex, args.runs_dir, batches)
     fails += more
     flags += check_overlap(tex, sources)
-    disclosure = section(tex, "AI use disclosure")
-    if not disclosure.strip():
-        fails.append("no AI use disclosure")
+    named = set(MACHINERY.findall(tex)) | {b for b in batches if re.search(rf"\b{re.escape(b)}\b", tex)}
+    fails += [f"the paper names the lab's own machinery: {word}" for word in sorted(named)]
     if not keys:
         flags.append("the paper cites nothing")
     fails += [f"template text left in: {p!r}" for p in PLACEHOLDERS if p in tex]

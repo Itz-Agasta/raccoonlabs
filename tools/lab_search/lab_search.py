@@ -3,6 +3,7 @@
 
   lab-search search "query" [--limit 5] [--source all|arxiv|crossref|s2]
   lab-search read 2401.00001
+  lab-search fulltext 2401.00001    print the paper's text, needs pdftotext
 
 Sealed items are withheld and every query is logged. The blocklist holds only
 hashes, so reading it doesn't reveal what's sealed.
@@ -11,7 +12,10 @@ import argparse
 import hashlib
 import json
 import re
+import subprocess
 import sys
+import tempfile
+import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
@@ -48,9 +52,19 @@ def is_sealed(blocked, *texts):
 
 
 def http_get(url):
+    return http_bytes(url).decode()
+
+
+def http_bytes(url):
     req = urllib.request.Request(url, headers={"User-Agent": "raccoonlabs-lab-search/0.1"})
-    with urllib.request.urlopen(req, timeout=25) as r:
-        return r.read().decode()
+    for attempt in (1, 2):
+        try:
+            with urllib.request.urlopen(req, timeout=25) as r:
+                return r.read()
+        except OSError:
+            if attempt == 2:
+                raise
+            time.sleep(4)
 
 
 def paper(title, authors, year, source, ident, abstract="", doi="", arxiv=""):
@@ -182,6 +196,39 @@ def cmd_read(args, blocked):
     return 0
 
 
+def cmd_fulltext(args, blocked):
+    # Sealed items are refused by ID here, and by title after the lookup, before any download.
+    if is_sealed(blocked, args.arxiv_id):
+        log(f"fulltext {args.arxiv_id}", "arxiv", refused=True)
+        print("lab-search: refused by the envelope blocklist", file=sys.stderr)
+        return REFUSED
+    bare = ARXIV_ID.sub(r"\1", args.arxiv_id)
+    try:
+        found = parse_arxiv(http_get(f"https://export.arxiv.org/api/query?id_list={urllib.parse.quote(bare)}"))
+        match = [p for p in found if p["arxiv"] == bare and not is_sealed(blocked, p["title"], p["arxiv"])]
+        if not match:
+            log(f"fulltext {args.arxiv_id}", "arxiv")
+            print(f"lab-search: nothing found for {bare}", file=sys.stderr)
+            return 1
+        pdf = http_bytes(f"https://arxiv.org/pdf/{urllib.parse.quote(bare)}")
+    except (OSError, ET.ParseError) as e:
+        log(f"fulltext {args.arxiv_id}", "arxiv", errors=[str(e)])
+        print(f"lab-search: arxiv failed: {e}", file=sys.stderr)
+        return 1
+    with tempfile.NamedTemporaryFile(suffix=".pdf") as f:
+        f.write(pdf)
+        f.flush()
+        r = subprocess.run(["pdftotext", "-layout", f.name, "-"], capture_output=True, text=True)
+    log(f"fulltext {args.arxiv_id}", "arxiv", results=1 if r.returncode == 0 else 0)
+    if r.returncode != 0:
+        print(f"lab-search: can't read that PDF: {r.stderr.strip()}", file=sys.stderr)
+        return 1
+    remember(match)
+    show(match[0])
+    print(r.stdout)
+    return 0
+
+
 def main(argv):
     p = argparse.ArgumentParser(prog="lab-search", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="action", required=True)
@@ -193,6 +240,9 @@ def main(argv):
     r = sub.add_parser("read")
     r.add_argument("arxiv_id")
     r.set_defaults(func=cmd_read)
+    t = sub.add_parser("fulltext")
+    t.add_argument("arxiv_id")
+    t.set_defaults(func=cmd_fulltext)
     args = p.parse_args(argv)
     try:
         blocked = load_blocklist()

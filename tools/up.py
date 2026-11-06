@@ -31,4 +31,5 @@ Next, in Switch Console:
   3. Templates > Import template > switch/lab.template.yaml, then Use > Create all.
 Then back here:
   4. just harden      closes the web tools Switch's settings leave open on Scout and Reviewer 2
+  5. just skills      installs the research skills and links them to the agents
 Try it in Slack: address @ringtail with a question in #lab-brainstorm.""")

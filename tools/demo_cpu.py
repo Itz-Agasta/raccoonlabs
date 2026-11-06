@@ -64,25 +64,31 @@ subprocess.run(["uv", "run", "--no-project", "--with", "matplotlib", "python", "
 import matplotlib; matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 plt.figure(figsize=(3.2, 2.2))
-plt.scatter([0] * 3, {means['B1']}, label="no noise (B1)")
-plt.scatter([1] * 3, {means['B2']}, label="20% noise (B2)")
-plt.xticks([0, 1], ["B1", "B2"]); plt.ylabel("test accuracy"); plt.legend(fontsize=6); plt.tight_layout()
+plt.scatter([0] * 3, {means['B1']}, label="no noise")
+plt.scatter([1] * 3, {means['B2']}, label="20% noise")
+plt.xticks([0, 1], ["clean", "noisy"]); plt.ylabel("test accuracy"); plt.legend(fontsize=6); plt.tight_layout()
 plt.savefig("{PAPER}/figures/results.pdf")
 """], check=True, capture_output=True)
 mean = {k: statistics.mean(v) for k, v in means.items()}
 values = lambda b: ", ".join(f"{v:.4f}" for v in means[b])
 tex = (PAPER / "main.tex").read_text()
-tex = tex.replace("Paper Title", "Demo: training-label noise on a toy classifier")
-tex = tex.replace("Author names (students write this line)", "just demo-cpu")
-tex = tex.replace("One paragraph: the question, the method, the main result with its numbers.",
-                  "A tool-chain demonstration on synthetic data, not a research finding.")
-tex = tex.replace("Describe the setup.", "A softmax classifier on synthetic data, three seeds per batch.")
-tex = tex.replace("Report only numbers from logged runs, and name the batch ID for each.",
-                  f"Batch B1 (no noise) test accuracy by seed: {values('B1')}. Batch B2 (20\\% label noise): {values('B2')}. "
-                  "\\begin{figure}[t]\\centering\\includegraphics[width=\\columnwidth]{figures/results.pdf}\\caption{Every seed of both batches.}\\end{figure}")
-tex = tex.replace("State which sections the students wrote and which the lab's agents drafted.",
-                  "This demo paper was filled in by a script. No agent or student wrote it.")
+for old, new in {
+    "Paper Title": "Training-label noise on a toy classifier: a tool-chain demonstration",
+    "Author names (students write this line)": "just demo-cpu",
+    "One paragraph: the question, the method, the main result with its numbers.": "A tool-chain demonstration on synthetic data, not a research finding.",
+    "The problem, the gap in prior work, and this paper's contributions.": "This script-filled paper exercises the tools.",
+    "What is already known, synthesised across sources, and how this study differs.": "None: this is a demonstration.",
+    "Describe the setup precisely enough to reproduce it.": "A softmax classifier on synthetic data, three seeds per condition.",
+    "Report every condition with its spread, seed count and tests.":
+        f"Test accuracy by seed without noise: {values('B1')}. With 20\\% label noise: {values('B2')}. "
+        "\\begin{figure}[t]\\centering\\includegraphics[width=\\columnwidth]{figures/results.pdf}\\caption{Every seed of both conditions.}\\end{figure}",
+    "What was found, and what should come next.": "The tools ran from seeded runs to a PDF.",
+}.items():
+    assert old in tex, old
+    tex = tex.replace(old, new)
 (PAPER / "main.tex").write_text(tex)
+with (PAPER / "provenance.txt").open("a") as f:
+    f.write("B1  no-noise condition\nB2  20% noise condition\n")
 run(lab_paper, "build", PAPER)
 
 step("3. Integrity check")

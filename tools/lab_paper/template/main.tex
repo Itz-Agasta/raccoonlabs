@@ -1,6 +1,6 @@
 \documentclass[10pt,twocolumn]{article}
 \usepackage[margin=2cm]{geometry}
-\usepackage{amsmath,booktabs,graphicx,hyperref,tikz}
+\usepackage{amsmath,booktabs,graphicx,microtype,siunitx,hyperref,tikz}
 \usetikzlibrary{arrows.meta,positioning}
 
 \title{Paper Title}
@@ -15,7 +15,10 @@ One paragraph: the question, the method, the main result with its numbers.
 \end{abstract}
 
 \section{Introduction}
-The question and why it matters.
+The problem, the gap in prior work, and this paper's contributions.
+
+\section{Related Work}
+What is already known, synthesised across sources, and how this study differs.
 
 \section{Method}
 \begin{figure}[t]
@@ -24,18 +27,21 @@ The question and why it matters.
   \caption{Method overview.}
   \label{fig:method}
 \end{figure}
-Describe the setup. Figure~\ref{fig:method} shows the method.
+Describe the setup precisely enough to reproduce it. Figure~\ref{fig:method} shows the method.
 
 \section{Results}
-Report only numbers from logged runs, and name the batch ID for each.
+Report every condition with its spread, seed count and tests.
+
+\section{Discussion}
+What the results mean, and alternative explanations.
 
 \section{Limitations}
 What this can't show.
 
-\section*{AI use disclosure}
-State which sections the students wrote and which the lab's agents drafted.
+\section{Conclusion}
+What was found, and what should come next.
 
 \nocite{example}
-\bibliographystyle{plain}
+\bibliographystyle{IEEEtran}
 \bibliography{refs}
 \end{document}

@@ -36,3 +36,7 @@ seal:
 # Check this machine, install the lab's tools, build the template, and print the Console steps
 up: install-tools template
     uv run python tools/up.py
+
+# Install the research skills (pinned, outside this repo) and link them to the agents
+skills:
+    uv run python tools/setup_skills.py

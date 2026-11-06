@@ -34,7 +34,8 @@ def test_anyone_in_the_room_can_address_them(agents):
 def test_web_settings_are_requested(agents):
     for name in ("ringtail", "bandit", "patch", "quill"):
         cfg = agents[name]["advanced_config"]
-        assert set(cfg["tools"]) == {"Bash", "Read", "Write", "Edit", "Glob", "Grep"}
+        assert {"Bash", "Read", "Write", "Edit", "Glob", "Grep", "Skill"} <= set(cfg["tools"])
+        assert not any(t.startswith("Bash(") for t in cfg["disallowedTools"])
         assert WEB_TOOLS <= set(cfg["disallowedTools"])
     for name in ("reviewer-2", "scout"):
         assert agents[name]["advanced_config"]["webSearch"] == "false"

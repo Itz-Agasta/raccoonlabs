@@ -142,3 +142,15 @@ def test_results_are_remembered_for_the_integrity_check_but_sealed_ones_never(en
     assert ls.main(["search", "open", "--source", "arxiv"]) == 0
     saved = (tmp / "sources.jsonl").read_text()
     assert "Open Paper" in saved and "Hidden" not in saved
+
+
+def test_fulltext_refuses_sealed_id_without_downloading(env, monkeypatch):
+    monkeypatch.setattr(ls, "http_bytes", lambda url: pytest.fail("must not download"))
+    assert ls.main(["fulltext", "2599.12345"]) == ls.REFUSED
+
+
+def test_fulltext_refuses_a_title_match_found_at_lookup(env, monkeypatch):
+    tmp, _ = env
+    monkeypatch.setattr(ls, "http_bytes", lambda url: pytest.fail("must not download"))
+    (tmp / "blocklist.sha256").write_text(digest("Open Paper On Learning") + "\n")
+    assert ls.main(["fulltext", "2401.00001"]) == 1
