@@ -41,7 +41,7 @@ def main():
                 continue
             if event["occurredAt"] < args.since:
                 continue
-            title = item.get("title", "")
+            title = re.sub(r"printf .*?\|\s*(\S*lab-envelope)", r"[passphrase hidden] | \1", item.get("title", ""))
             counts[agent] = counts.get(agent, 0) + 1
             if RISKY.search(title) and not ALLOWED.match(title):
                 hits.append((event["occurredAt"][:19], agent, item["status"], title[:160]))
