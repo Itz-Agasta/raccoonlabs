@@ -96,8 +96,11 @@ def search_crossref(query, limit):
     out = []
     for w in json.loads(http_get(f"https://api.crossref.org/works?{q}"))["message"]["items"]:
         authors = [" ".join(filter(None, [a.get("given"), a.get("family")])) for a in w.get("author", [])]
-        year = str((w.get("issued", {}).get("date-parts") or [[""]])[0][0])
-        out.append(paper((w.get("title") or [""])[0], authors, year, "crossref", w["DOI"], re.sub(r"<[^>]+>", " ", w.get("abstract", "")), doi=w["DOI"]))
+        year = str(((w.get("issued", {}).get("date-parts") or [[""]])[0] or [""])[0] or "")
+        title = (w.get("title") or [""])[0]
+        if not title or not w.get("DOI"):
+            continue  # Crossref has records with no title or date; skip those rather than lose the query
+        out.append(paper(title, authors, year, "crossref", w["DOI"], re.sub(r"<[^>]+>", " ", w.get("abstract") or ""), doi=w["DOI"]))
     return out
 
 

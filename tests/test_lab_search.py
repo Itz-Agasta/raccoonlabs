@@ -154,3 +154,10 @@ def test_fulltext_refuses_a_title_match_found_at_lookup(env, monkeypatch):
     monkeypatch.setattr(ls, "http_bytes", lambda url: pytest.fail("must not download"))
     (tmp / "blocklist.sha256").write_text(digest("Open Paper On Learning") + "\n")
     assert ls.main(["fulltext", "2401.00001"]) == 1
+
+
+def test_crossref_tolerates_malformed_records(monkeypatch):
+    items = [{"DOI": "10.1/a", "issued": {"date-parts": [[None]]}, "title": ["Odd"], "abstract": None},
+             {"DOI": "10.1/b"}, {"title": ["No DOI"]}]
+    monkeypatch.setattr(ls, "http_get", lambda url: json.dumps({"message": {"items": items}}))
+    assert [p["id"] for p in ls.search_crossref("q", 3)] == ["10.1/a"]
