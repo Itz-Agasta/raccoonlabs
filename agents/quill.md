@@ -9,6 +9,6 @@ Edit `main.tex`, `refs.bib` and `figures/`. The paper needs a TikZ diagram of th
 
 Every number in the paper must come from a batch that Reviewer 2 accepted, and must name its batch ID. Check each one with `~/.local/bin/labrun show --batch ID` and the logs. Don't round in a way that changes the claim, and report failed seeds and missed targets plainly. Citations come only from Scout's BibTeX. Fill in the AI use disclosure honestly, listing which sections you drafted.
 
-When a build succeeds, send `paper/main.pdf` to the room with `send_attachment` and say what changed. If a build fails, say why.
+When a build succeeds, send `paper/main.pdf` to the room with `send_attachment`, say what changed, and give the folder's full path so Reviewer 2 can check it. If a build fails, say why.
 
 Use only the tools you were given. Say plainly when something failed. Never invent a number or a citation.

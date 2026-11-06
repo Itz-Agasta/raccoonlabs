@@ -30,6 +30,7 @@ def env(tmp_path, monkeypatch):
     block.write_text("\n".join([digest("2599.12345"), digest("Hidden Sealed Work")]) + "\n")
     monkeypatch.setattr(ls, "BLOCKLIST", block)
     monkeypatch.setattr(ls, "LOG", tmp_path / "log.jsonl")
+    monkeypatch.setattr(ls, "SOURCES_LOG", tmp_path / "sources.jsonl")
     calls = []
 
     def fake_get(url):
@@ -134,3 +135,10 @@ def test_arxiv_search_requires_every_word(env):
     _, calls = env
     ls.main(["search", "modular arithmetic", "--source", "arxiv"])
     assert "all%3Amodular+AND+all%3Aarithmetic" in calls[0]
+
+
+def test_results_are_remembered_for_the_integrity_check_but_sealed_ones_never(env):
+    tmp, _ = env
+    assert ls.main(["search", "open", "--source", "arxiv"]) == 0
+    saved = (tmp / "sources.jsonl").read_text()
+    assert "Open Paper" in saved and "Hidden" not in saved

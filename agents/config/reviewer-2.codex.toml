@@ -1,0 +1,5 @@
+# Project-level Codex settings for Reviewer 2. Switch's webSearch setting has no effect on Codex.
+web_search = "disabled"
+
+[features]
+apps = false

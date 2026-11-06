@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "webfetch": "deny",
+    "websearch": "deny",
+    "bash": {"*": "allow", "curl *": "deny", "wget *": "deny"}
+  },
+  "tools": {"webfetch": false, "websearch": false, "chrome-devtools_*": false, "context7_*": false, "github_*": false},
+  "mcp": {
+    "chrome-devtools": {"enabled": false},
+    "context7": {"enabled": false},
+    "github": {"enabled": false}
+  }
+}

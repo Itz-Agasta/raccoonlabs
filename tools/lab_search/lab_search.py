@@ -20,6 +20,7 @@ from pathlib import Path
 
 BLOCKLIST = Path(__file__).resolve().parents[2] / "envelope/blocklist.sha256"
 LOG = Path.home() / ".local/share/raccoonlabs/lab-search.jsonl"
+SOURCES_LOG = Path.home() / ".local/share/raccoonlabs/sources.jsonl"
 ATOM = {"a": "http://www.w3.org/2005/Atom"}
 ARXIV_ID = re.compile(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b")
 REFUSED = 3
@@ -118,6 +119,16 @@ def log(query, source, refused=False, results=0, withheld=0, errors=()):
                                 refused=refused, results=results, withheld=withheld, errors=list(errors))) + "\n")
 
 
+def remember(papers):
+    """Keep what was returned, so lab-integrity can check citations and overlap offline."""
+    if not papers:
+        return
+    SOURCES_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with SOURCES_LOG.open("a") as f:
+        for p in papers:
+            f.write(json.dumps({k: p[k] for k in ("title", "year", "id", "doi", "arxiv", "abstract")}) + "\n")
+
+
 def show(p):
     print(f"## {p['title']}\n{', '.join(p['authors'][:6]) or 'Unknown authors'} ({p['year']}), {p['source']}: {p['id']}")
     if p["abstract"]:
@@ -140,6 +151,7 @@ def cmd_search(args, blocked):
     visible = [p for p in results if not is_sealed(blocked, p["title"], p["arxiv"], p["id"], p["doi"])]
     withheld = len(results) - len(visible)
     log(args.query, args.source, results=len(visible), withheld=withheld, errors=errors)
+    remember(visible)
     for p in visible:
         show(p)
     print(f"results: {len(visible)}, withheld: {withheld}")
@@ -165,6 +177,7 @@ def cmd_read(args, blocked):
     if not match:
         print(f"lab-search: nothing found for {bare}", file=sys.stderr)
         return 1
+    remember(match)
     show(match[0])
     return 0
 

@@ -15,26 +15,29 @@ agents:
     display_name: Ringtail
     description: Postdoc. Pushes back on ideas, then writes the plan with the students.
     provider: claude
+    model: sonnet
     location: "{location}"
     directory: "{$agents_dir}/ringtail"
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch]
+      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
   - name: bandit
     display_name: Bandit
     description: Lab Manager. Turns requests into tasks, assigns them, keeps the notebook.
     provider: claude
+    model: haiku
     location: "{location}"
     directory: "{$agents_dir}/bandit"
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch]
+      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
   - name: scout
     display_name: Scout
     description: Librarian. Finds sources through lab-search and keeps the library.
     provider: opencode
+    model: opencode/deepseek-v4.1-flash-free
     location: "{location}"
     directory: "{$agents_dir}/scout"
     addressing: anyone
@@ -44,22 +47,24 @@ agents:
     display_name: Patch
     description: Engineer. Writes and runs seeded experiments after a student approves.
     provider: claude
+    model: sonnet
     location: "{location}"
     directory: "{$agents_dir}/patch"
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch]
+      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
   - name: quill
     display_name: Quill
     description: Scribe. Writes assigned sections, makes figures, builds the PDF.
     provider: claude
+    model: sonnet
     location: "{location}"
     directory: "{$agents_dir}/quill"
     addressing: anyone
     advanced_config:
       tools: [Bash, Read, Write, Edit, Glob, Grep]
-      disallowedTools: [WebSearch, WebFetch]
+      disallowedTools: [WebSearch, WebFetch, "Bash(curl:*)", "Bash(wget:*)"]
   - name: reviewer-2
     display_name: Reviewer 2
     description: Peer reviewer. Checks claims against logged runs. At least 3 seeds.
