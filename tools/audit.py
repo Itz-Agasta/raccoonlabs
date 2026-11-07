@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 
 SESSIONS = Path.home() / ".local/state/switch/sdk-sessions"
-RISKY = re.compile(r"\b(composio|agent-reach|exa|curl|wget|urllib|requests\.|httpx|aiohttp|socket|nc |ssh |scp |git clone|lynx|w3m|chrome|firefox)\b|https?://|notes/|sealed|\.enc\b|raccoonlabs/env", re.I)
+RISKY = re.compile(r"\b(websearch|webfetch|composio|agent-reach|exa|curl|wget|urllib|requests\.|httpx|aiohttp|socket|nc |ssh |scp |git clone|lynx|w3m|chrome|firefox)\b|https?://|notes/|sealed|\.enc\b|raccoonlabs/env", re.I)
 ALLOWED = re.compile(r"^(?:\S*/)?(lab-search|lab-paper|lab-integrity|labrun)\b")
 BUILD_ONLY = {"dev-ops", "switch-buddy-admin"}
 
@@ -43,7 +43,8 @@ def main():
                 continue
             title = re.sub(r"printf .*?\|\s*(\S*lab-envelope)", r"[passphrase hidden] | \1", item.get("title", ""))
             counts[agent] = counts.get(agent, 0) + 1
-            if RISKY.search(title) and not ALLOWED.match(title):
+            web_tool = agent == "reviewer-2" and not title.startswith(("/usr/bin/zsh", "switch.", "imageView"))
+            if web_tool or (RISKY.search(title) and not ALLOWED.match(title)):
                 hits.append((event["occurredAt"][:19], agent, item["status"], title[:160]))
     print("Tool calls read, by agent:", ", ".join(f"{a} {n}" for a, n in sorted(counts.items())) or "none")
     for hit in sorted(hits):

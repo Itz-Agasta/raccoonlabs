@@ -4,15 +4,15 @@ Measured by asking each deployed agent to try each action: Bandit, Patch and Rev
 
 | Check | Ringtail, Bandit, Patch, Quill (Claude Code) | Reviewer 2 (Codex) | Scout (OpenCode) |
 |---|---|---|---|
-| Built-in web search | Blocked: no tool | Blocked: no tool since `just harden` | Reports no tool since `just harden`; declined to try |
-| Built-in web fetch | Blocked: no tool | Blocked: no tool since `just harden` | Reports no tool since `just harden`; declined to try |
+| Built-in web search | Blocked: no tool | **Open: search returned results** in its `#lab-bench` session on 2026-11-07, despite `just harden`. Its `#lab-review` session reported no tool | Reports no tool since `just harden`; declined to try |
+| Built-in web fetch | Blocked: no tool | **Open:** opened a Springer page in the same `#lab-bench` session | Reports no tool since `just harden`; declined to try |
 | User's MCP servers (Exa, Chrome) | Blocked: none callable | None offered | Reports none since `just harden` |
 | Shell network (`curl`) | **Open: HTTP 200** | Blocked by Codex's sandbox (exit 6) | Denied in config, not proven: it declined to try. Other programs could still reach the network |
 | Read files outside own folder | **Open** | **Open** | **Open** (counted `notes/`, read nothing) |
 | Literature search | Not given | Not given | `lab-search`, every query logged |
 | Working folder | `~/.switch/agents/localhost-40401/<agent>` | Same pattern | Same pattern |
 
-`just harden` writes `agents/config/` into the agents' folders. Switch's `webSearch: "false"` alone had no effect on Reviewer 2 (web search returned results before), and Scout listed `websearch`, `webfetch` and Chrome tools before it. A `Bash(curl:*)` deny rule can't close the Claude agents' shell route under Switch, because it removes Bash altogether.
+`just harden` writes `agents/config/` into the agents' folders. A fresh `codex exec` in Reviewer 2's folder reports no web tool with it, but that doesn't hold for every session Switch starts, and we don't know why. Probe every room before relying on it. Switch's `webSearch: "false"` alone had no effect on Reviewer 2 (web search returned results before), and Scout listed `websearch`, `webfetch` and Chrome tools before it. A `Bash(curl:*)` deny rule can't close the Claude agents' shell route under Switch, because it removes Bash altogether.
 
 ## Skills
 
@@ -30,7 +30,8 @@ With the server, Console, a browser and three agents working at once (2026-11-04
 
 ## What the demo may claim today
 
-- Claude Code and Codex lab agents have no built-in web or MCP web tools. Scout reports none.
+- Claude Code lab agents have no built-in web or MCP web tools. Scout reports none.
+- Reviewer 2's built-in web tool is not reliably closed by `just harden`. `docs/final-run.md` has the extra step, and this claim stays open until probes in every room pass.
 - Reviewer 2's shell can't reach the network.
 - Nothing stops a Claude agent's shell from reaching the web, or any agent from reading files this user can read.
 
