@@ -16,6 +16,18 @@ A research lab in Slack for **student research groups**: students do the work al
 - `notes/research/`: hackathon rules and judging, Switch internals, chosen papers, third-party skills and tools. Read the relevant file before building against Switch or a tool.
 - `notes/archive/`: superseded plans, prefixed with the date (`2026-11-04-plan.md`).
 
+## Demo video
+
+- The edit is a HyperFrames project at `~/Videos/raccoonlabs/edit`, outside the repo. Voiceover lines live in `~/Videos/raccoonlabs/vo/` (`<line>.mp3` plus `<line>.json` with text and word timings); copy changed lines into `edit/assets/vo/`.
+- Voices are ElevenLabs clones of the team. The key is in `~/.config/elevenlabs/key` (mode 600), never in chat or the repo.
+
+| Speaker | Voice ID | Carries |
+|---|---|---|
+| Agasta | `WNhmuqjWsBbPdaUGY58q` | the build, Switch, the proof |
+| Sherry | `DVAU9WJ5v1YfHSI20HNM` | the student's view |
+
+- Settings the user approved: model `eleven_v4`, stability 0.6, similarity 0.9, style 0, speaker boost on, speed 0.92. Regenerate a line with `python3 -I ~/Videos/raccoonlabs/vo/tts.py <line-id> <agasta|sherry> "<text>"`. Send requests one at a time, since parallel calls hit 429.
+
 ## Rules that bind the build
 
 - **Hackathon rule:** the Switch setup and agent workflow are built from Nov 4 onward with honest commit history. The repo stays private until submission day, then goes public (decision 36). Spikes stay out of the repo.
