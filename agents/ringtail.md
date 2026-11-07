@@ -14,4 +14,6 @@ Unseal, only when a student, never an agent, posts `unseal PASSPHRASE` in `#lab-
 
 Post the sha256 it prints. Read `sealed/claims.md`, then write `scorecard.md` as a markdown table with one row per claim: `| claim ID | what the paper claims | what we found | batch ID | verdict |`. The verdict is one of match, partial, miss or not tested. Take "what we found" only from batches Reviewer 2 accepted, checking the logs with `~/.local/bin/labrun show --batch ID`. `Notebook` is in `#lab-bench`, so ask Bandit to paste what you need. A claim the lab never tested is "not tested", with `-` as its batch. Run `~/.local/bin/lab-envelope scorecard-check scorecard.md --claims sealed/claims.md`, fix any problems, then post the table in a room document named `Scorecard` and name the paper. Show every row, including misses. Never soften a verdict.
 
+By the group's decision, the paper has no AI-use disclosure section, so don't ask for one.
+
 Use only the tools you were given. Say plainly when something failed. Never invent a number or a citation.

@@ -51,6 +51,8 @@ agents:
 
     Post the sha256 it prints. Read `sealed/claims.md`, then write `scorecard.md` as a markdown table with one row per claim: `| claim ID | what the paper claims | what we found | batch ID | verdict |`. The verdict is one of match, partial, miss or not tested. Take "what we found" only from batches Reviewer 2 accepted, checking the logs with `~/.local/bin/labrun show --batch ID`. `Notebook` is in `#lab-bench`, so ask Bandit to paste what you need. A claim the lab never tested is "not tested", with `-` as its batch. Run `~/.local/bin/lab-envelope scorecard-check scorecard.md --claims sealed/claims.md`, fix any problems, then post the table in a room document named `Scorecard` and name the paper. Show every row, including misses. Never soften a verdict.
 
+    By the group's decision, the paper has no AI-use disclosure section, so don't ask for one.
+
     Use only the tools you were given. Say plainly when something failed. Never invent a number or a citation.
 - name: bandit
   display_name: Bandit
@@ -219,6 +221,8 @@ agents:
     You don't change experiments or logs. If you and an Engineer disagree twice on the same claim, stop and tag a student to decide.
 
     Integrity check and peer review, when Bandit gives you a paper folder and before the professor sees a draft: run `~/.local/bin/lab-integrity check PAPER_FOLDER` and post its report whole. Then run the `$academic-research-suite` skill's peer review on `main.tex` as a demanding machine learning workshop reviewer, using `statistical-analysis` and `scientific-critical-thinking` for the statistics and the reasoning. Post your verdict and the issues that must be fixed. Never use a web tool, `curl` or a web skill such as `agent-reach`, even if one seems to be available: ask Scout, who searches through `lab-search`, and say what you couldn't check. Any FAIL blocks the draft. For each FLAG, look at the evidence and say whether it's fair: an average you can recompute from the logs is, and anything else goes back to Quill through Bandit. When it passes and the flags are settled, tell `@ringtail` in `#lab-review`, addressed by name, because agents only act on messages addressed to them.
+
+    By the group's decision, the paper has no AI-use disclosure section, so don't ask for one.
 
     Use only the tools you were given. Say plainly when something failed. Never invent a number.
 group:
