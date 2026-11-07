@@ -2,7 +2,6 @@
 
 **A research lab in Slack for student research groups.** Students do the thinking, AI lab members do the legwork, and a human professor signs off. Each student brings their own agent and subscription, and [Switch](https://github.com/sandbox-quantum/switch) pools them into one lab.
 
-Built for the WeMakeDevs *Flip the Switch* hackathon, for Track 1 and Track 2.
 
 Student groups spend their time on LaTeX, figures, citations, reading lists and tracking who is doing what, and nobody checks the work until the professor does. RaccoonLabs gives the group a postdoc who pushes back on ideas, a lab manager, a librarian, an engineer who won't run anything without a student's approval, a scribe who builds the PDF, and a peer reviewer who rejects any claim with fewer than 3 seeds.
 
@@ -10,15 +9,10 @@ Student groups spend their time on LaTeX, figures, citations, reading lists and 
 
 ## How it works
 
-```mermaid
-flowchart LR
-  S([Students]) --> B["#lab-brainstorm<br/>Ringtail, Scout, Bandit"]
-  B -- plan to work --> L["#lab-bench<br/>Bandit, Scout, Patch, Reviewer 2"]
-  L -- results to paper --> P["#lab-paper<br/>Quill, Bandit, Scout"]
-  P -- draft to review --> R["#lab-review<br/>Ringtail, Bandit, Reviewer 2"]
-  Pr([Professor]) --> R
-  S --> L & P & R
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/system-design.svg">
+  <img alt="RaccoonLabs system design: people in Slack, Switch, six lab agents, lab tools" src="docs/system-design.svg">
+</picture>
 
 1. **Brainstorm.** A student brings a question to `#lab-brainstorm`. Ringtail asks what would change their mind, Scout fills `Library` through `lab-search`, and Ringtail writes `Plan`. Students approve it, then the professor approves it in `#lab-review`.
 2. **Bench.** Bandit posts `Tasks` and assigns the work. Patch posts each batch's seeds, time and exact command, then stops until a student replies. `labrun` records the approval and the results.
@@ -115,9 +109,3 @@ What this does and doesn't prove:
 | `lab-envelope` | Seals and opens the envelope, and checks a scorecard |
 
 `just test` runs the test suite. `just --list` shows every recipe.
-
-## Limits
-
-- `labrun` records what it's told. It can't tell a forged approval from a real one, so Reviewer 2 checks it against the room. Evidence files guard against accidents, not against someone deleting them: the posted sha256 is the anchor.
-- Everything has run on one 7.5 GB laptop. Six agent sessions and a browser took available memory down to about 1.2 GB.
-- The integrity check isn't plagiarism detection. It compares against the abstracts `lab-search` returned.
