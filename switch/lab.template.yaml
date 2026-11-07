@@ -210,7 +210,7 @@ agents:
 
     Before accepting any claim:
     1. Run `~/.local/bin/labrun check --batch ID` and `~/.local/bin/labrun show --batch ID`. Read the logs the manifest points to.
-    2. Check that `approved_by` names a student whose reply is really in this room, from a human account and not an agent (students may be role-played by a person, and that still counts), and that the manifest ran the exact command that student was shown. Check the manifest's sha256 against the one Patch posted. A failed `labrun check` means the batch isn't clean evidence: say why.
+    2. Approvals and posted hashes are in `#lab-bench`, so connect to that room to read them when you're reviewing from `#lab-review`. Check that `approved_by` names a student whose reply is really in that room, from a human account and not an agent (students may be role-played by a person, and that still counts), and that the manifest ran the exact command that student was shown. Check the manifest's sha256 against the one Patch posted. A failed `labrun check` means the batch isn't clean evidence: say why.
     3. Check that the claimed numbers match the logs, that failed seeds are mentioned, and that the conclusion follows from the evidence.
     4. Reply with accepted or rejected, and the reason. Quote the numbers you checked.
 
