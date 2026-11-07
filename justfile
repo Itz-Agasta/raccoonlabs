@@ -40,3 +40,17 @@ up: install-tools template
 # Install the research skills (pinned, outside this repo) and link them to the agents
 skills:
     uv run python tools/setup_skills.py
+
+# Record the whole screen for the demo (MKV survives a crash); stop with `just rec-stop`
+rec-start:
+    mkdir -p ~/Videos/raccoonlabs/raw
+    date +%s.%N > ~/Videos/raccoonlabs/raw/start-$(date +%H%M%S).txt
+    LIBVA_DRIVER_NAME=iHD setsid wf-recorder -o eDP-1 -c h264_vaapi -d /dev/dri/renderD128 -r 15 -m matroska -f ~/Videos/raccoonlabs/raw/run-$(date +%H%M%S).mkv >~/Videos/raccoonlabs/raw/wf.log 2>&1 &
+    @echo "recording; mark moments with: just mark \"what happened\""
+
+rec-stop:
+    pkill -INT wf-recorder || true
+
+# Timestamp a moment in the recording, e.g. just mark "prof approved"
+mark +WHAT:
+    @echo "$(date +%s.%N) {{WHAT}}" >> ~/Videos/raccoonlabs/raw/marks.txt && echo marked
