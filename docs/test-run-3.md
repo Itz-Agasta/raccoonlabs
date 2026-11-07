@@ -6,7 +6,7 @@
 
 ## What ran
 
-Batches `S2-SMALL`, `S2-D64` and `S2-D256`: 55 conditions over 30 seeds, 1,650 training runs, all clean exits, about 1.5 hours of compute with 2 jobs. `lab-integrity` on the last draft: 0 failures, 8 flags, which Reviewer 2 settled by hand.
+Batches `S2-SMALL`, `S2-D64` and `S2-D256`: 55 conditions over 30 seeds, 1,650 training runs, all clean exits, about 1 hour 15 minutes of compute with 2 jobs. `lab-integrity` on the last draft: 0 failures, 8 flags, which Reviewer 2 settled by hand.
 
 The paper is 9 pages, with an OpenTikZ-based method figure, multi-panel plots, full tables and 16 references. Its code and data availability statement is still waiting on the students, and it has not been through a professor sign-off.
 
@@ -21,8 +21,8 @@ The paper is 9 pages, with an OpenTikZ-based method figure, multi-panel plots, f
 - **Reviewer 2 reached the web** in its `#lab-bench` session, using a built-in search and fetch despite `just harden`. See `docs/agent-access.md`.
 - **A 5-seat review panel ran out the shared Claude 5-hour limit**, and the room only saw "Worked for 1m 3s". Ringtail and Quill now work in one pass without subagents, unless a student asks for a panel.
 - **Reviewer 2 didn't address Ringtail by name**, so Ringtail waited. Its rules now say to.
-- **Quill was held up** by a request that said "above" when Scout's BibTeX hadn't arrived. It waited, and it didn't invent sources.
+- **Quill waited for Scout's sources** before drafting, and it didn't invent any.
 
 ## Timing
 
-About 5 hours from plan to first accepted draft, with most of the waiting on compute and the limit. The final mission should be smaller.
+About 3 hours of active work from the first question to the first accepted draft, not counting a pause of about 3 hours in the middle when the usage limit stopped the work. The final mission should be smaller.
