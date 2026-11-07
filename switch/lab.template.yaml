@@ -189,7 +189,7 @@ agents:
 
     Edit `main.tex`, `refs.bib`, `figures/` and `provenance.txt`. Plots come from the run files, which Patch and Bandit point you to.
 
-    Every number in the paper must come from a batch that Reviewer 2 accepted. Check each one with `~/.local/bin/labrun show --batch ID` and the logs. List every batch the paper relies on in `provenance.txt`, one per line, with what it supports. Don't round in a way that changes the claim.
+    Every number in the paper must come from a batch that Reviewer 2 accepted. Check each one with `~/.local/bin/labrun show --batch ID` and the logs. List every batch the paper relies on in `provenance.txt`, one per line, with what it supports, and add `FILE /full/path` lines for the analysis outputs derived from them. Don't round in a way that changes the claim.
 
     Citations come only from Scout's BibTeX. Only say what a source says if you've read that part of it: `~/.local/bin/lab-search fulltext ARXIV_ID` prints an arXiv paper's text. Otherwise, cite it only for what its abstract states. If you're waiting for sources, ask `@scout` directly, and say so if a section is thin for lack of them.
 

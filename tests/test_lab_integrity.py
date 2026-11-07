@@ -98,3 +98,19 @@ def test_overlap_with_a_source_is_flagged(lab, capsys):
     edit(lab, "It worked.", phrase + ".")
     code, out = run(lab, capsys)
     assert code == 0 and "overlap" in out
+
+
+def test_numbers_in_a_named_analysis_file_are_not_flagged(lab, capsys):
+    edit(lab, "0.91", "0.99")
+    (lab / "table.csv").write_text("mean,0.99\n")
+    with (lab / "paper/provenance.txt").open("a") as f:
+        f.write(f"FILE {lab / 'table.csv'}\n")
+    code, out = run(lab, capsys)
+    assert code == 0 and "FLAG number" not in out
+
+
+def test_missing_analysis_file_fails(lab, capsys):
+    with (lab / "paper/provenance.txt").open("a") as f:
+        f.write("FILE /no/such/file\n")
+    code, out = run(lab, capsys)
+    assert code == 1 and "missing file" in out

@@ -84,14 +84,16 @@ def run_numbers(batch, runs_dir):
 
 
 def provenance(paper):
+    """Batches, and analysis files derived from them, that the paper relies on."""
     path = Path(paper) / "provenance.txt"
     if not path.exists():
-        return []
-    lines = (line.split() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#"))
-    return [parts[0] for parts in lines]
+        return [], []
+    lines = [line.split() for line in path.read_text().splitlines() if line.strip() and not line.startswith("#")]
+    files = [Path(parts[1]).expanduser() for parts in lines if parts[0] == "FILE" and len(parts) > 1]
+    return [parts[0] for parts in lines if parts[0] != "FILE"], files
 
 
-def check_results(tex, runs_dir, batches):
+def check_results(tex, runs_dir, batches, files=()):
     results = section(tex, "Results")
     fails, flags = [], []
     if not batches:
@@ -103,6 +105,11 @@ def check_results(tex, runs_dir, batches):
             fails.append(f"batch {batch}: {(r.stdout + r.stderr).strip()}")
             continue
         logged |= run_numbers(batch, runs_dir)
+    for path in files:
+        if not path.exists():
+            fails.append(f"provenance.txt names a missing file: {path}")
+            continue
+        logged |= {float(n) for n in NUMBER.findall(path.read_text(errors="ignore"))}
     plain = re.sub(r"\\(?:ref|label|cite\w*|includegraphics|input)(?:\[[^\]]*\])?\{[^}]*\}", " ", results)
     plain = re.sub(r"\\begin\{\w+\}(?:\[[^\]]*\])?|\\end\{\w+\}", " ", plain)
     for n in sorted(set(NUMBER.findall(plain)), key=float):
@@ -139,8 +146,8 @@ def cmd_check(args):
     bib = bib_entries(bib_path.read_text()) if bib_path.exists() else {}
     sources = load_sources(args.sources)
     keys, fails = check_citations(tex, bib, sources)
-    batches = provenance(paper)
-    more, flags = check_results(tex, args.runs_dir, batches)
+    batches, files = provenance(paper)
+    more, flags = check_results(tex, args.runs_dir, batches, files)
     fails += more
     flags += check_overlap(tex, sources)
     named = set(MACHINERY.findall(tex)) | {b for b in batches if re.search(rf"\b{re.escape(b)}\b", tex)}

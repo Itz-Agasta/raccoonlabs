@@ -1,1 +1,2 @@
 # One line per batch the paper relies on: BATCH-ID  what it supports. Not part of the paper.
+# FILE /full/path  an analysis output those batches produced, so derived numbers can be checked against it.
